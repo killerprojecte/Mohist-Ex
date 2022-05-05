@@ -8,18 +8,28 @@
  import net.minecraft.stats.StatList;
  import net.minecraft.util.DamageSource;
  import net.minecraft.util.datafix.DataFixer;
-@@ -26,6 +27,10 @@
+@@ -26,7 +27,20 @@
  import net.minecraftforge.fml.relauncher.SideOnly;
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
++import org.bukkit.Bukkit;
++import org.bukkit.ChatColor;
++import org.bukkit.configuration.file.FileConfiguration;
++import org.bukkit.configuration.file.YamlConfiguration;
++import org.bukkit.entity.Player;
 +import org.bukkit.event.entity.EntityPickupItemEvent;
 +import org.bukkit.event.player.PlayerPickupItemEvent;
 +import com.mohistmc.common.RealTimeTicking;
 +import com.mohistmc.configuration.MohistConfig;
++import org.bukkit.inventory.Inventory;
  
++import java.io.File;
++import java.io.IOException;
++
  public class EntityItem extends Entity
  {
-@@ -38,6 +43,13 @@
+     private static final Logger field_145803_d = LogManager.getLogger();
+@@ -38,6 +52,13 @@
      private String field_145802_g;
      public float field_70290_d;
  
@@ -33,7 +43,7 @@
      public EntityItem(World p_i1709_1_, double p_i1709_2_, double p_i1709_4_, double p_i1709_6_)
      {
          super(p_i1709_1_);
-@@ -55,6 +67,7 @@
+@@ -55,6 +76,7 @@
      {
          this(p_i1710_1_, p_i1710_2_, p_i1710_4_, p_i1710_6_);
          this.func_92058_a(p_i1710_8_);
@@ -41,7 +51,7 @@
      }
  
      protected boolean func_70041_e_()
-@@ -78,6 +91,7 @@
+@@ -78,6 +100,7 @@
  
      public void func_70071_h_()
      {
@@ -49,7 +59,7 @@
          if (this.func_92059_d().func_190926_b())
          {
              this.func_70106_y();
-@@ -86,10 +100,26 @@
+@@ -86,10 +109,26 @@
          {
              super.func_70071_h_();
  
@@ -79,7 +89,7 @@
  
              this.field_70169_q = this.field_70165_t;
              this.field_70167_r = this.field_70163_u;
-@@ -135,7 +165,9 @@
+@@ -135,7 +174,9 @@
  
              if (this.field_70122_E)
              {
@@ -90,7 +100,7 @@
              }
  
              this.field_70159_w *= (double)f;
-@@ -147,10 +179,12 @@
+@@ -147,10 +188,12 @@
                  this.field_70181_x *= -0.5D;
              }
  
@@ -105,7 +115,7 @@
  
              this.func_70072_I();
  
-@@ -167,17 +201,54 @@
+@@ -167,17 +210,54 @@
                  }
              }
  
@@ -163,7 +173,7 @@
              this.func_70289_a(entityitem);
          }
      }
-@@ -225,13 +296,20 @@
+@@ -225,13 +305,20 @@
                      {
                          return false;
                      }
@@ -189,7 +199,7 @@
                          return true;
                      }
                  }
-@@ -282,6 +360,7 @@
+@@ -282,6 +369,7 @@
  
      public boolean func_70097_a(DamageSource p_70097_1_, float p_70097_2_)
      {
@@ -197,7 +207,7 @@
          if (this.func_180431_b(p_70097_1_))
          {
              return false;
-@@ -292,6 +371,9 @@
+@@ -292,6 +380,9 @@
          }
          else
          {
@@ -207,7 +217,7 @@
              this.func_70018_K();
              this.field_70291_e = (int)((float)this.field_70291_e - p_70097_2_);
  
-@@ -314,6 +396,7 @@
+@@ -314,6 +405,7 @@
          p_70014_1_.func_74777_a("Health", (short)this.field_70291_e);
          p_70014_1_.func_74777_a("Age", (short)this.field_70292_b);
          p_70014_1_.func_74777_a("PickupDelay", (short)this.field_145804_b);
@@ -215,7 +225,7 @@
  
          if (this.func_145800_j() != null)
          {
-@@ -358,22 +441,58 @@
+@@ -358,22 +450,114 @@
          {
              this.func_70106_y();
          }
@@ -238,8 +248,64 @@
 +
 +            if (this.field_145804_b <= 0 && canHold > 0) {
 +                itemstack.func_190920_e(canHold);
++                if (!p_70100_1_.canPickUpLoot){
++                    Player p = (Player) p_70100_1_.getBukkitEntity();
++                    int size = 0;
++                    boolean status = true;
++                    if (p.hasPermission("morespace.row.6")){
++                        size = 6;
++                    } else if (p.hasPermission("morespace.row.5")){
++                        size = 5;
++                    } else if (p.hasPermission("morespace.row.4")){
++                        size = 4;
++                    } else if (p.hasPermission("morespace.row.3")){
++                        size = 3;
++                    } else if (p.hasPermission("morespace.row.2")){
++                        size = 2;
++                    } else if (p.hasPermission("morespace.row.1")){
++                        size = 1;
++                    } else {
++                        status =false;
++                    }
++                    if (status){
++                        String data = System.getProperty("user.dir") + "/MoreSpaceData/";
++                        Inventory inv = Bukkit.createInventory(null,size*9,color("&7[&b更多背包&7]"));
++                        File file = new File(data + p.getDisplayName() + ".yml");
++                        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
++                        if (!file.exists()){
++                            if (!file.getParentFile().exists()){
++                                file.getParentFile().mkdirs();
++                            }
++                            try {
++                                file.createNewFile();
++                            } catch (IOException e) {
++                                e.printStackTrace();
++                            }
++                        } else {
++                            if (config.get("items")!=null){
++                                for (String key : config.getConfigurationSection("items").getKeys(false)){
++                                    org.bukkit.inventory.ItemStack is = config.getItemStack("items."+key);
++                                    int local = Integer.parseInt(key);
++                                    if (local<(size*9)){
++                                        inv.setItem(local,is);
++                                    }
++                                }
++                            }
++                        }
++                        inv.addItem(((org.bukkit.entity.Item) this.getBukkitEntity()).getItemStack());
++                        for (int e = 0;e<inv.getContents().length;e++){
++                            config.set("items." + e,inv.getContents()[e]);
++                        }
++                        try {
++                            config.save(file);
++                        } catch (IOException e) {
++                            e.printStackTrace();
++                        }
++                        return;
++                    }
++                }
 +                PlayerPickupItemEvent playerEvent = new PlayerPickupItemEvent((org.bukkit.entity.Player) p_70100_1_.getBukkitEntity(), (org.bukkit.entity.Item) this.getBukkitEntity(), remaining);
-+                playerEvent.setCancelled(!p_70100_1_.canPickUpLoot);
++                playerEvent.setCancelled(false);
 +                this.field_70170_p.getServer().getPluginManager().callEvent(playerEvent);
 +                if (playerEvent.isCancelled()) {
 +                    return;
@@ -247,7 +313,7 @@
 +
 +                // Call newer event afterwards
 +                EntityPickupItemEvent entityEvent = new EntityPickupItemEvent((org.bukkit.entity.Player) p_70100_1_.getBukkitEntity(), (org.bukkit.entity.Item) this.getBukkitEntity(), remaining);
-+                entityEvent.setCancelled(!p_70100_1_.canPickUpLoot);
++                entityEvent.setCancelled(false);
 +                this.field_70170_p.getServer().getPluginManager().callEvent(entityEvent);
 +                if (entityEvent.isCancelled()) {
 +                    return;
@@ -276,7 +342,7 @@
                      this.func_70106_y();
                      itemstack.func_190920_e(i);
                  }
-@@ -394,9 +513,9 @@
+@@ -394,9 +578,9 @@
      }
  
      @Nullable
@@ -288,11 +354,15 @@
  
          if (!this.field_70170_p.field_72995_K && entity instanceof EntityItem)
          {
-@@ -476,6 +595,6 @@
+@@ -476,6 +660,10 @@
      public void func_174870_v()
      {
          this.func_174871_r();
 -        this.field_70292_b = 5999;
 +        this.field_70292_b = func_92059_d().func_77973_b().getEntityLifespan(func_92059_d(), field_70170_p) - 1;
      }
++
++    private String color(String text){
++        return ChatColor.translateAlternateColorCodes('&',text);
++    }
  }

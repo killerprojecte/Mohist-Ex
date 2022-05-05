@@ -18,8 +18,8 @@ public class SpaceCommand extends Command {
     public SpaceCommand(String name) {
         super(name);
 
-        this.description = "Gets the version of this server including any plugins in use";
-        this.usageMessage = "/morespace [plugin name]";
+        this.description = "Open MoreSpace Inventory Command";
+        this.usageMessage = "/morespace";
         this.setAliases(Collections.singletonList("mspace"));
         this.setPermission("morespace.use");
     }
