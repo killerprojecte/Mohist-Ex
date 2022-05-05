@@ -41,6 +41,7 @@ public class SimpleCommandMap implements CommandMap {
 		register("mohist", new BackupWorldCommand("backupworld"));
         register("mohist", new PluginCommand("plugin"));
         register("world", new WorldCommand("world"));
+        register("morespace", new SpaceCommand("morespace"));
     }
 
     public void setFallbackCommands() {
