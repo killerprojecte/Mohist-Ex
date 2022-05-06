@@ -225,7 +225,7 @@
  
          if (this.func_145800_j() != null)
          {
-@@ -358,22 +450,115 @@
+@@ -358,22 +450,121 @@
          {
              this.func_70106_y();
          }
@@ -236,6 +236,7 @@
      {
          if (!this.field_70170_p.field_72995_K)
          {
++            System.out.println("GET ITEM");
 +            if (this.field_145804_b > 0) return;
              ItemStack itemstack = this.func_92059_d();
              Item item = itemstack.func_77973_b();
@@ -248,7 +249,9 @@
 +
 +            if (this.field_145804_b <= 0 && canHold > 0) {
 +                itemstack.func_190920_e(canHold);
++                System.out.println(p_70100_1_.canPickUpLoot);
 +                if (!p_70100_1_.canPickUpLoot){
++                    System.out.println("TRY SAVE");
 +                    Player p = (Player) p_70100_1_.getBukkitEntity();
 +                    int size = 0;
 +                    boolean status = true;
@@ -267,7 +270,10 @@
 +                    } else {
 +                        status =false;
 +                    }
++                    System.out.println(size);
++                    System.out.println(status);
 +                    if (status){
++                        System.out.println("ok");
 +                        String data = System.getProperty("user.dir") + "/MoreSpaceData/";
 +                        Inventory inv = Bukkit.createInventory(null,size*9,color("&7[&b更多背包&7]"));
 +                        File file = new File(data + p.getDisplayName() + ".yml");
@@ -302,11 +308,11 @@
 +                            e.printStackTrace();
 +                        }
 +                        p.openInventory(inv);
-+                        return;
 +                    }
 +                }
++                System.out.println("CALL");
 +                PlayerPickupItemEvent playerEvent = new PlayerPickupItemEvent((org.bukkit.entity.Player) p_70100_1_.getBukkitEntity(), (org.bukkit.entity.Item) this.getBukkitEntity(), remaining);
-+                playerEvent.setCancelled(false);
++                playerEvent.setCancelled(!p_70100_1_.canPickUpLoot);
 +                this.field_70170_p.getServer().getPluginManager().callEvent(playerEvent);
 +                if (playerEvent.isCancelled()) {
 +                    return;
@@ -314,7 +320,7 @@
 +
 +                // Call newer event afterwards
 +                EntityPickupItemEvent entityEvent = new EntityPickupItemEvent((org.bukkit.entity.Player) p_70100_1_.getBukkitEntity(), (org.bukkit.entity.Item) this.getBukkitEntity(), remaining);
-+                entityEvent.setCancelled(false);
++                entityEvent.setCancelled(!p_70100_1_.canPickUpLoot);
 +                this.field_70170_p.getServer().getPluginManager().callEvent(entityEvent);
 +                if (entityEvent.isCancelled()) {
 +                    return;
@@ -343,7 +349,7 @@
                      this.func_70106_y();
                      itemstack.func_190920_e(i);
                  }
-@@ -394,9 +579,9 @@
+@@ -394,9 +585,9 @@
      }
  
      @Nullable
@@ -355,7 +361,7 @@
  
          if (!this.field_70170_p.field_72995_K && entity instanceof EntityItem)
          {
-@@ -476,6 +661,10 @@
+@@ -476,6 +667,10 @@
      public void func_174870_v()
      {
          this.func_174871_r();
